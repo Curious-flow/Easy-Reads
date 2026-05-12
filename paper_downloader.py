@@ -2,10 +2,9 @@ import requests
 import os
 import tarfile
 import shutil
-from typing import Optional
 import re
 
-
+from typing import Optional
 
 def download_file(url, save_as=None):
 
@@ -14,37 +13,84 @@ def download_file(url, save_as=None):
     If `save_as` is not provided, the filename is inferred from the URL or headers.
     '''
 
+    # Requests.get Send a GET request
+    # Requests.get takes the URL and tries to connect to the server at the address
+    # Server responds with Headers and File Data (if successful)
+    # Stream=True means the response body is downloaded in chunks, not all at once
+
+    # arXiv abstract links need to be converted to source links for tar download
+    if "arxiv.org/abs/" in url:
+        url = url.replace("arxiv.org/abs/", "arxiv.org/src/", 1)
+
     response = requests.get(url, stream=True)
+
+    # Raise an exception if the server returned an error (e.g. 404, 500)
     response.raise_for_status()
 
-    # Try filename from Content-Disposition header
+    # print(type(response))
+    # print(response.status_code)
+
+    # If no filename was provided (save_as = input parameter, Set to None by default 
+    # Then try to figure one out automatically
+
     if save_as is None:
+
+        # Check the Content-Disposition header — servers sometimes specify the filename here
+        # e.g. Content-Disposition: attachment; filename="2602.07159.tar.gz"
         cd = response.headers.get("content-disposition")
+
         if cd and "filename=" in cd:
+            # Extract the filename value from the header and strip surrounding quotes/spaces
             save_as = cd.split("filename=")[-1].strip().strip('"')
         else:
+            # Fall back to the last segment of the URL (e.g. "2602.07159" from the arXiv URL)
+            # If that's also empty, use a generic default name
+            #basename gets the last part of the URL path, which is often the paper ID or filename
             save_as = os.path.basename(url) or "downloaded_file"
+            print("TEST",save_as)
 
-    # Save to disk
+    # Open the destination file in binary write mode
     with open(save_as, "wb") as f:
+
+        # Write the response in 8 KB chunks to avoid loading the whole file
+        # into memory at once
+
+        # response.iter_content streams the data (within response) in chunks
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
 
     print(f"✅ Downloaded {save_as} Successfully")
+
+    # Return the filename so the caller knows where the file was saved
     return save_as
 
 
 
 def extract_tar(filename, extract_to="."):
-
+                        
     '''
     Extracts a tar file to a specified directory.
     '''
 
+    # Downloaded file is likely a zip/tar file, so we need to extract it
+    # tarfile.open opens the tar file for reading. The 'r:*' mode auto-detects
+    # the compression type (gzip, bzip2, xz, or uncompressed tar)
+    # tar.extractall extracts all the contents of the tar file to the 
+    # specified directory (extract_to)
+    # After extraction, it prints how many files were extracted and where they
+    # were extracted to
+
+    try:
+        os.makedirs(extract_to, exist_ok=True)
+    except OSError:
+        if not os.path.isdir(extract_to):
+            raise
     with tarfile.open(filename, "r:*") as tar:  # r:* auto-detects compression (.gz, .bz2, .xz, or plain .tar)
         tar.extractall(path=extract_to)
         print(f"📂 Extracted {len(tar.getnames())} files to '{os.path.abspath(extract_to)}'")
 
+
+### Line by Line Comments Good Till Top
 
 
 def find_largest_tex(root_folder):
@@ -80,7 +126,7 @@ def find_largest_tex(root_folder):
 
     # If no original file found, use largest _easy file
     if largest_file is None and easy_files:
-        largest_file = max(easy_files, key=easy_files.get)
+        largest_file = max(easy_files, key=lambda k: easy_files[k])
         largest_size = easy_files[largest_file]
 
     if largest_file:
@@ -91,34 +137,8 @@ def find_largest_tex(root_folder):
     return largest_file
 
 
-
 ############################## Works Fine till Above #####################################
 ##########################################################################################
-
-
-
-TUNING_BLOCK = r"""
-% === BEGIN AUTO FONT/FIG TUNING (inserted by script) =========================
-\newcommand{\BaseFontSizePt}{12}
-\newcommand{\BaseBaselineSkipPt}{14.4}
-
-\usepackage{graphicx}
-\usepackage{etoolbox}
-
-% Figure width and caption customization intentionally disabled
-\AtBeginDocument{%
-}
-
-% === EASY_READS forced font override =================
-\makeatletter
-\renewcommand\normalsize{%
-   \@setfontsize\normalsize{\BaseFontSizePt}{\BaseBaselineSkipPt}%
-}
-\normalsize
-\makeatother
-% =====================================================
-% === END AUTO FONT/FIG TUNING ================================================
-""".lstrip("\n")
 
 
 
@@ -147,7 +167,10 @@ def replace_missing_document_class(tex_path: str, force_replace: bool = False) -
     ]
     
     # Find documentclass or documentstyle line (documentstyle is old LaTeX 2.09 syntax)
-    docclass_pattern = re.compile(r"\\(?:documentclass|documentstyle)(?:\[[^\]]*\])?\{([^}]+)\}")
+    docclass_pattern = re.compile(
+        r"^[ \t]*\\(?:documentclass|documentstyle)(?:\[[^\]]*\])?\{([^}]+)\}",
+        flags=re.MULTILINE,
+    )
     match = docclass_pattern.search(tex)
     
     if match:
@@ -224,38 +247,3 @@ def replace_missing_document_class(tex_path: str, force_replace: bool = False) -
                     print(f"ℹ️  Using original document class: {current_class} (class file found)")
     
     return tex_path
-
-
-
-def ensure_tuning_block(tex_path: str) -> str:
-    """
-    Ensures the tuning block exists in the .tex file.
-    Creates a new file with _easy suffix if added.
-    """
-    with open(tex_path, "r", encoding="utf-8", errors="ignore") as f:
-        tex = f.read()
-
-    if "BEGIN AUTO FONT/FIG TUNING" in tex:
-        print("ℹ️ Tuning block already present")
-        return tex_path
-
-    # Insert after \documentclass if found, else prepend
-    m = re.search(r"\\documentclass(?:\[[^\]]*\])?\{[^\}]+\}", tex)
-    if m:
-        new_tex = tex[: m.end()] + "\n" + TUNING_BLOCK + "\n" + tex[m.end():]
-    else:
-        new_tex = TUNING_BLOCK + "\n" + tex
-
-    root, ext = os.path.splitext(tex_path)
-    
-    # If file already ends with _easy, overwrite it; otherwise create new _easy file
-    if root.endswith('_easy'):
-        new_path = tex_path
-    else:
-        new_path = root + "_easy" + ext
-
-    with open(new_path, "w", encoding="utf-8", errors="ignore") as f:
-        f.write(new_tex)
-
-    print(f"✅ Inserted tuning block into new file: {new_path}")
-    return new_path

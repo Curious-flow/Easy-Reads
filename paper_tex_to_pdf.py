@@ -288,7 +288,7 @@ def compile_with_multiple_passes(tex_file_path, output_dir=None):
                 print("   Attempting automatic class replacement...")
                 
                 # Import the replacement function
-                from paper_downloader_new import replace_missing_document_class
+                from paper_downloader import replace_missing_document_class
                 
                 # Replace the class (force replace since we know it's missing from compilation error)
                 new_tex_path = replace_missing_document_class(current_tex_path, force_replace=True)

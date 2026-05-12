@@ -8,12 +8,12 @@ Automatically downloads ArXiv papers and generates reader-friendly PDFs with lar
 import os
 import sys
 
-import paper_downloader_new
+import paper_downloader
 import paper_tuner
 import paper_tex_to_pdf
 
 
-from paper_downloader_new import download_file, extract_tar, find_largest_tex, replace_missing_document_class
+from paper_downloader import download_file, extract_tar, find_largest_tex, replace_missing_document_class
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
 
@@ -124,30 +124,10 @@ if __name__ == "__main__":
     ### My Paper
     #url = "https://arxiv.org/src/2602.07159"
 
-    ### Check this A & A Paper
-    #url="https://arxiv.org/src/2605.04149"
+    ### This Paper: High Energy Astro, Works Well
+    #url="https://arxiv.org/abs/2605.10940"
 
-
-    ### This Paper: Equation Spill
-    #url="https://arxiv.org/abs/2605.08080"
-
-    ### This Paper: Table Spill
-    #url="https://arxiv.org/abs/2605.07965"
-
-    ### This Paper: Error
-    #url="https://arxiv.org/abs/2605.06742"
-
-    ### This Paper: No Changes
-    #url="https://arxiv.org/abs/2605.06749"
-
-    ### This Paper: Citations ??
-    #url="https://arxiv.org/abs/2605.06670"
-    
-    ### This Paper: Many Spills
-    #url="https://arxiv.org/abs/2605.06766"
-
-    ### 
-    url="https://arxiv.org/abs/2605.06781"
+    url="https://arxiv.org/abs/2605.10940"
 
 
     # Font and formatting settings (optional)

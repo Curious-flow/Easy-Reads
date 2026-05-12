@@ -26,3 +26,6 @@ env/
 
 # Project-generated output
 Downloads/
+
+# Bug and output logs (manual notes, not version controlled)
+bug_logs/
