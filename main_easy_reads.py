@@ -143,16 +143,19 @@ if __name__ == "__main__":
     ### This Paper: Citations ??
     #url="https://arxiv.org/abs/2605.06670"
     
+    ### This Paper: Many Spills
+    #url="https://arxiv.org/abs/2605.06766"
+
     ### 
-    url="https://arxiv.org/abs/2605.06786"
+    url="https://arxiv.org/abs/2605.06781"
+
 
     # Font and formatting settings (optional)
-    base_font_pt = 14 # Base font size (Recommended: 12)
+    base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
-    single_column = False # Default is False, which means it will
-    # keep the original column format (sometimes).
+    single_column = True # Default is False, which means it will
+    # keep the original column format (often double colum).
     # Set to True to force single column
-    # (not recommended for all papers).
 
     # Future Knobs: 
     # Fig Size, Caption Size, Section/Subsection Heading Sizes
