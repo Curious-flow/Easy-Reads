@@ -7,6 +7,8 @@ Automatically downloads ArXiv papers and generates reader-friendly PDFs with lar
 
 import os
 import sys
+import re
+import urllib.request
 
 import paper_downloader
 import paper_tuner
@@ -43,12 +45,28 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     os.makedirs(downloads_dir, exist_ok=True)
 
     print("📥 Downloading paper...")
-    paper_id = url.rstrip("/").split("/")[-1]
+    raw_id = url.rstrip("/").split("/")[-1]  # e.g. "2605.08080" or "2605.08080v2"
+    version_match = re.search(r'(v\d+)$', raw_id)
+    if version_match:
+        paper_id = raw_id[:version_match.start()]
+        version_str = version_match.group(1)
+    else:
+        paper_id = raw_id
+        # Query arXiv API to get the latest version number
+        try:
+            api_url = f"https://export.arxiv.org/api/query?id_list={paper_id}"
+            with urllib.request.urlopen(api_url) as resp:
+                content = resp.read().decode()
+            ver = re.search(r'arxiv\.org/abs/[\d.]+v(\d+)', content)
+            version_str = f"v{ver.group(1)}" if ver else ""
+        except Exception:
+            version_str = ""
+    print(f"arXiv ID: {paper_id}  Version: {version_str}")
     tar_path = download_file(url, save_as=os.path.join(downloads_dir, f"{paper_id}.tar.gz"))
     print("\n")
 
     # Derive folder name from URL (e.g., Just arXiv ID)
-    # rstrip removes trailing slas
+    # rstrip removes trailing slash
     # Then split the URL into chunks of words by slash, and take last part as folder name
 
     folder_name = paper_id
@@ -97,8 +115,8 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         formatted_papers_dir = os.path.join(project_root, "Formatted Papers")
         os.makedirs(formatted_papers_dir, exist_ok=True)
         
-        # Rename to arxiv_id_easy.pdf
-        final_pdf_name = f"{paper_id}_easy.pdf"
+        # Rename to arxiv_idvN_easy.pdf
+        final_pdf_name = f"{paper_id}{version_str}_easy.pdf"
         final_pdf_path = os.path.join(formatted_papers_dir, final_pdf_name)
         
         # Move the PDF from Downloads to Formatted Papers
@@ -134,12 +152,14 @@ if __name__ == "__main__":
     ### This Paper: High Energy Astro, Works Well
     #url="https://arxiv.org/abs/2605.10940"
 
-    url="https://arxiv.org/src/2602.07159"
+    url="https://arxiv.org/abs/2605.10940"
 
     # Font and formatting settings (optional)
     base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
-    single_column = True # Default is False, which means it will
+
+    single_column = True
+    #single_column = False # Default is False, which means it will
     # keep the original column format (often double colum).
     # Set to True to force single column
 
@@ -152,7 +172,5 @@ if __name__ == "__main__":
     # =============================================================================
 
     main(url, base_font_pt, baseline_pt, single_column=single_column)
-
-
 
 
