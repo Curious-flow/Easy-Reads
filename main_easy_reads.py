@@ -19,7 +19,7 @@ from paper_tex_to_pdf import compile_with_multiple_passes
 
 
 
-def main(url, base_font_pt, baseline_pt):
+def main(url, base_font_pt, baseline_pt, single_column=False):
 
     """
     Main processing pipeline for Easy Reads.
@@ -89,6 +89,7 @@ def main(url, base_font_pt, baseline_pt):
         tex_with_class,
         base_font_pt=base_font_pt,
         baseline_pt=baseline_pt,
+        single_column=single_column,
     )
     
 
@@ -148,6 +149,10 @@ if __name__ == "__main__":
     # Font and formatting settings (optional)
     base_font_pt = 14 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
+    single_column = False # Default is False, which means it will
+    # keep the original column format (sometimes).
+    # Set to True to force single column
+    # (not recommended for all papers).
 
     # Future Knobs: 
     # Fig Size, Caption Size, Section/Subsection Heading Sizes
@@ -157,7 +162,7 @@ if __name__ == "__main__":
     # Run the main process
     # =============================================================================
 
-    main(url, base_font_pt, baseline_pt)
+    main(url, base_font_pt, baseline_pt, single_column=single_column)
 
 
 

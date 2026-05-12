@@ -33,6 +33,7 @@ def set_tuning_values_newfile(
     tex_path: str,
     base_font_pt=None,
     baseline_pt=None,
+    single_column: bool = False,
 ) -> str:
     with open(tex_path, "r", encoding="utf-8", errors="ignore") as f:
         tex = f.read()
@@ -70,6 +71,22 @@ def set_tuning_values_newfile(
             new_tex = tuned_block + "\n" + tex
     else:
         new_tex = tex[: block_match.start()] + tuned_block + tex[block_match.end():]
+
+    # Single column: remove twocolumn from documentclass options and inject \onecolumn
+    if single_column:
+        # Remove twocolumn from \documentclass[...] options
+        new_tex = re.sub(
+            r'(\\documentclass\[)([^\]]*)(\])',
+            lambda m: m.group(1) + re.sub(r',?\btwocolumn\b,?', lambda mm: ',' if mm.group(0).count(',') == 2 else '', m.group(2)).strip(',') + m.group(3),
+            new_tex,
+        )
+        # Inject \onecolumn right after \begin{document}
+        new_tex = re.sub(
+            r'(\\begin\{document\})',
+            r'\1\n\\onecolumn',
+            new_tex,
+        )
+        print("📐 Single column mode applied")
 
     root, ext = os.path.splitext(tex_path)
 
