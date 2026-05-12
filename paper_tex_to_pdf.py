@@ -303,8 +303,6 @@ def compile_with_multiple_passes(tex_file_path, output_dir=None):
                         return pdf_path
     
     if pdf_path:
-        print(f"\n🎉 Success! Your PDF is ready: {pdf_path}")
-        print("\n")
         return pdf_path
     else:
         print("❌ PDF compilation failed. Check the error messages above.")

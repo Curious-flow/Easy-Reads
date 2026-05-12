@@ -29,7 +29,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     print("\n" + "=" * 50)
     print("🚀 Easy Reads - ArXiv Paper Processor")
     print("=" * 50)
-    print("\n")
+    #print("\n")
 
     
     # Step 1. Download Paper
@@ -45,7 +45,6 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     print("📥 Downloading paper...")
     paper_id = url.rstrip("/").split("/")[-1]
     tar_path = download_file(url, save_as=os.path.join(downloads_dir, f"{paper_id}.tar.gz"))
-    print("Downloaded file path:", tar_path)
     print("\n")
 
     # Derive folder name from URL (e.g., Just arXiv ID)
@@ -54,8 +53,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
 
     folder_name = paper_id
     paper_folder = os.path.join(downloads_dir, folder_name)
-    print("Folder name is:", folder_name)
-    print("\n")
+    #print("\n")
 
     # Step 2. Extract the Paper | Likely involves unzipping a document source archive 
     extract_tar(tar_path, paper_folder)
@@ -65,8 +63,6 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
 
     print("📝 Processing LaTeX file...")
     largest_tex = find_largest_tex(paper_folder)
-    print("\n Checking Again")
-    print(type(largest_tex))
     print("Largest TeX file is", largest_tex)
 
     if not largest_tex:
@@ -81,9 +77,8 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     # Step 4 (Check This). Replace missing document classes with standard article class
     tex_with_class = replace_missing_document_class(largest_tex)
 
-    print("TEX WITH CLASS IS",tex_with_class)
-
     # Apply formatting improvements
+    print("\n")
     print("🎨 Applying formatting improvements...")
     new_tex = set_tuning_values_newfile(
         tex_with_class,
@@ -98,7 +93,19 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     pdf_path = compile_with_multiple_passes(new_tex)
     
     if pdf_path:
-        print(f"✅ Complete! Enhanced PDF saved to: {pdf_path}")
+        # Move PDF to Formatted Papers folder with arxiv ID naming
+        formatted_papers_dir = os.path.join(project_root, "Formatted Papers")
+        os.makedirs(formatted_papers_dir, exist_ok=True)
+        
+        # Rename to arxiv_id_easy.pdf
+        final_pdf_name = f"{paper_id}_easy.pdf"
+        final_pdf_path = os.path.join(formatted_papers_dir, final_pdf_name)
+        
+        # Move the PDF from Downloads to Formatted Papers
+        import shutil
+        shutil.move(pdf_path, final_pdf_path)
+        
+        print(f"\n🎉 Success! Your PDF is ready: {final_pdf_path}")
         print("\n")
     else:
         print("\n❌ Processing failed. Check error messages above.")
@@ -127,8 +134,7 @@ if __name__ == "__main__":
     ### This Paper: High Energy Astro, Works Well
     #url="https://arxiv.org/abs/2605.10940"
 
-    url="https://arxiv.org/abs/2605.10940"
-
+    url="https://arxiv.org/src/2602.07159"
 
     # Font and formatting settings (optional)
     base_font_pt = 12 # Base font size (Recommended: 12)

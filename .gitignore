@@ -24,8 +24,14 @@ env/
 *.toc
 *.synctex.gz
 
+# Workflow file (This one is for me for now)
+workflow.ipynb
+
+
 # Project-generated output
 Downloads/
+Formatted Papers/
 
 # Bug and output logs (manual notes, not version controlled)
 bug_logs/
+
