@@ -1,0 +1,42 @@
+# Python packages
+# Install with: pip install -r requirements.txt
+# Or install directly: pip install requests
+requests>=2.31.0
+
+# Python standard library modules used by this project
+# These are included with Python and do not need to be
+# installed separately.
+#   - os
+#   - sys
+#   - re
+#   - urllib.request
+#   - subprocess
+#   - tarfile
+#   - shutil
+#   - typing
+
+# ------------------------------------------------------------
+# LaTeX system requirements (NOT installed by pip)
+# ------------------------------------------------------------
+# This project calls these executables from your system
+# PATH (required for converting .tex to .pdf and handling
+# bibliography)_:
+#   - pdflatex
+#   - bibtex
+#
+# Install ONE of these LaTeX distributions:
+#   - MiKTeX: available for Windows, macOS, and Linux
+#   - TeX Live: available for Windows, macOS, Linux, and other Unix-like systems
+#   - MacTeX: macOS-specific redistribution of TeX Live with Mac tools included
+#
+# Common choices by platform:
+# Windows:
+#   - TeX Live or MiKTeX
+# macOS:
+#   - MacTeX (recommended)
+#   - TeX Live or MiKTeX
+# Linux (Debian/Ubuntu):
+#   - TeX Live via package manager (recommended)
+#     sudo apt-get install -y texlive-full
+#   - MiKTeX
+

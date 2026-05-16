@@ -152,16 +152,18 @@ if __name__ == "__main__":
     ### This Paper: High Energy Astro, Works Well
     #url="https://arxiv.org/abs/2605.10940"
 
-    url="https://arxiv.org/abs/2605.10940"
+    url="https://arxiv.org/abs/2605.11083"
 
     # Font and formatting settings (optional)
-    base_font_pt = 12 # Base font size (Recommended: 12)
+    base_font_pt = 10 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
 
     single_column = True
-    #single_column = False # Default is False, which means it will
-    # keep the original column format (often double colum).
-    # Set to True to force single column
+
+    #single_column = False # Default is False,
+    # meaning it will retain the original column format
+    # of the paper (which is often double column).
+    # Set to True to change tosingle column
 
     # Future Knobs: 
     # Fig Size, Caption Size, Section/Subsection Heading Sizes
@@ -172,5 +174,4 @@ if __name__ == "__main__":
     # =============================================================================
 
     main(url, base_font_pt, baseline_pt, single_column=single_column)
-
-
+    
