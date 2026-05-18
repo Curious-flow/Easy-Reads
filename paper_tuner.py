@@ -101,5 +101,3 @@ def set_tuning_values_newfile(
 
     print(f"🆕 Updated TeX file: {new_path}")
     return new_path
-
-
