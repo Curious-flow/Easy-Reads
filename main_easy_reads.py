@@ -3,8 +3,6 @@ Easy Reads - ArXiv Paper Processor
 Automatically downloads ArXiv papers and generates reader-friendly PDFs with larger fonts.
 """
 
-
-
 import os
 import sys
 import re
@@ -14,12 +12,9 @@ import paper_downloader
 import paper_tuner
 import paper_tex_to_pdf
 
-
 from paper_downloader import download_file, extract_tar, find_largest_tex, replace_missing_document_class
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
-
-
 
 def main(url, base_font_pt, baseline_pt, single_column=False):
 
@@ -33,7 +28,6 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     print("=" * 50)
     #print("\n")
 
-    
     # Step 1. Download Paper
 
     print("URL is", url)
@@ -45,7 +39,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     os.makedirs(downloads_dir, exist_ok=True)
 
     print("📥 Downloading paper...")
-    raw_id = url.rstrip("/").split("/")[-1]  # e.g. "2605.08080" or "2605.08080v2"
+    raw_id = url.rstrip("/").split("/")[-1]  # e.g. "3605.08080" or "3605.08080v2"
     version_match = re.search(r'(v\d+)$', raw_id)
     if version_match:
         paper_id = raw_id[:version_match.start()]
@@ -73,7 +67,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     paper_folder = os.path.join(downloads_dir, folder_name)
     #print("\n")
 
-    # Step 2. Extract the Paper | Likely involves unzipping a document source archive 
+    # Step 2. Extract the Paper | Unzip the downloaded tar.gz file
     extract_tar(tar_path, paper_folder)
     
     # Step 3. Find and process the Largest LaTeX file (the main paper source file)
@@ -87,12 +81,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         print("\n❌ Could not find a .tex file to process.")
         return
 
-
-    ### Fine Till Above
-
-    ### Now Will try to Fix Below
-    
-    # Step 4 (Check This). Replace missing document classes with standard article class
+    # Step 4. Replace missing document classes with standard article class
     tex_with_class = replace_missing_document_class(largest_tex)
 
     # Apply formatting improvements
@@ -105,7 +94,6 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         single_column=single_column,
     )
     
-
     # Compile to PDF
     print("📄 Compiling to PDF...")
     pdf_path = compile_with_multiple_passes(new_tex)
@@ -119,7 +107,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         final_pdf_name = f"{paper_id}{version_str}_easy.pdf"
         final_pdf_path = os.path.join(formatted_papers_dir, final_pdf_name)
         
-        # Move the PDF from Downloads to Formatted Papers
+        # Move the PDF from /Downloads to /Formatted Papers
         import shutil
         shutil.move(pdf_path, final_pdf_path)
         
@@ -132,47 +120,34 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
 
 if __name__ == "__main__":
 
-
     # ==========================================================
     # ╔════════════════════════════════════════════════════════╗
-    # ║             Enter Settings Below Including:            ║
+    # ║            Enter Settings Below Including:             ║
     # ║          ArXiv URL of the paper, Font Size,            ║
-    # ║                 and Line Spacing                       ║
+    # ║           Line Spacing (derived by default)            ║
     # ║          Don't Tweak Rest of the Code!                 ║
     # ╚════════════════════════════════════════════════════════╝
     # ==========================================================
 
+    #ENTER ARXIV URL HERE
+    #Make sure it's the main abstract page URL,
+    #e.g. https://arxiv.org/abs/XXXX.YYYY
 
-    ### Chess Classic
-    #url = "https://arxiv.org/src/2509.19443"
+    url="https://arxiv.org/abs/2605.10940"
 
-    ### My Paper
-    #url = "https://arxiv.org/src/2602.07159"
-
-    ### This Paper: High Energy Astro, Works Well
-    #url="https://arxiv.org/abs/2605.10940"
-
-    ### This Paper: ERRORS?
-    #url="https://arxiv.org/abs/2605.13914"
-
-    url = "https://arxiv.org/abs/2605.13946"
-    # Font and formatting settings (optional)
+    # Font and formatting settings 
     base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
 
-    single_column = True
+    single_column = False
 
-    #single_column = False # Default is False,
+    # single_column = False # Default is False,
     # meaning it will retain the original column format
     # of the paper (which is often double column).
-    # Set to True to change tosingle column
-
-    # Future Knobs: 
-    # Fig Size, Caption Size, Section/Subsection Heading Sizes
-    # Abstract Size
+    # Set to True to change to single column
 
     # =============================================================================
-    # Run the main process
+    # Run main
     # =============================================================================
 
     main(url, base_font_pt, baseline_pt, single_column=single_column)

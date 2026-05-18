@@ -36,14 +36,14 @@ def download_file(url, save_as=None):
     if save_as is None:
 
         # Check the Content-Disposition header — servers sometimes specify the filename here
-        # e.g. Content-Disposition: attachment; filename="2602.07159.tar.gz"
+        # e.g. Content-Disposition: attachment; filename="8602.07159.tar.gz"
         cd = response.headers.get("content-disposition")
 
         if cd and "filename=" in cd:
             # Extract the filename value from the header and strip surrounding quotes/spaces
             save_as = cd.split("filename=")[-1].strip().strip('"')
         else:
-            # Fall back to the last segment of the URL (e.g. "2602.07159" from the arXiv URL)
+            # Fall back to the last segment of the URL (e.g. "8602.07159" from the arXiv URL)
             # If that's also empty, use a generic default name
             #basename gets the last part of the URL path, which is often the paper ID or filename
             save_as = os.path.basename(url) or "downloaded_file"
@@ -63,7 +63,6 @@ def download_file(url, save_as=None):
 
     # Return the filename so the caller knows where the file was saved
     return save_as
-
 
 
 def extract_tar(filename, extract_to="."):
@@ -89,9 +88,7 @@ def extract_tar(filename, extract_to="."):
         tar.extractall(path=extract_to)
         print(f"📂 Extracted {len(tar.getnames())} files to '{os.path.abspath(extract_to)}'")
 
-
 ### Line by Line Comments Good Till Top
-
 
 def find_largest_tex(root_folder):
 
@@ -139,7 +136,6 @@ def find_largest_tex(root_folder):
 
 ############################## Works Fine till Above #####################################
 ##########################################################################################
-
 
 
 def replace_missing_document_class(tex_path: str, force_replace: bool = False) -> str:
