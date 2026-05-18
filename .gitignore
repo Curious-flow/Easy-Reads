@@ -35,3 +35,5 @@ Formatted Papers/
 # Bug and output logs (manual notes, not version controlled)
 bug_logs/
 
+# Previous git Comments
+previous_git_comments.txt

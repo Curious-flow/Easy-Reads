@@ -152,10 +152,12 @@ if __name__ == "__main__":
     ### This Paper: High Energy Astro, Works Well
     #url="https://arxiv.org/abs/2605.10940"
 
-    url="https://arxiv.org/abs/2605.11083"
+    ### This Paper: ERRORS?
+    #url="https://arxiv.org/abs/2605.13914"
 
+    url = "https://arxiv.org/abs/2605.13946"
     # Font and formatting settings (optional)
-    base_font_pt = 10 # Base font size (Recommended: 12)
+    base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
 
     single_column = True
@@ -174,4 +176,3 @@ if __name__ == "__main__":
     # =============================================================================
 
     main(url, base_font_pt, baseline_pt, single_column=single_column)
-    
