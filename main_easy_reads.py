@@ -131,15 +131,15 @@ if __name__ == "__main__":
 
     #ENTER ARXIV URL HERE
     #Make sure it's the main abstract page URL,
-    #e.g. https://arxiv.org/abs/XXXX.YYYY
+    #e.g. https://arxiv.org/abs/XXXX.YYYYY
 
-    url="https://arxiv.org/abs/2605.10940"
+    url="https://arxiv.org/abs/2605.16111"
 
     # Font and formatting settings 
     base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
 
-    single_column = False
+    single_column = True
 
     # single_column = False # Default is False,
     # meaning it will retain the original column format
