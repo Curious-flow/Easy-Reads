@@ -24,9 +24,11 @@ env/
 *.toc
 *.synctex.gz
 
-# Workflow file (This one is for me for now)
+# Workflow file 
 workflow.ipynb
 
+# Previous git Comments
+previous_git_comments.txt
 
 # Project-generated output
 Downloads/
@@ -35,5 +37,4 @@ Formatted Papers/
 # Bug and output logs (manual notes, not version controlled)
 bug_logs/
 
-# Previous git Comments
-previous_git_comments.txt
+
