@@ -4,6 +4,8 @@ Easy Reads is an automated Python program that downloads arXiv papers, processes
 
 The main goal of this initial release of Easy Reads is: Ease of Read.
 
+## DOI
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20278341.svg)](https://doi.org/10.5281/zenodo.20278341)
 
 ## Description
