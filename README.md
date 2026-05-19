@@ -2,6 +2,8 @@
 
 Easy Reads is an automated Python program that downloads arXiv papers, processes their LaTeX source files, and generates more reader friendly and accessible papers in PDF format with larger fonts and an optional single column formatting for the main text.
 
+The main goal of this initial release of Easy Reads is: Ease of Read.
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20278341.svg)](https://doi.org/10.5281/zenodo.20278341)
 
 ## Description
