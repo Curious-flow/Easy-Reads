@@ -140,12 +140,12 @@ if __name__ == "__main__":
     base_font_pt = 12 # Base font size (Recommended: 12)
     baseline_pt = 1.2* base_font_pt # Line spacing
 
-    single_column = True
+    single_column = False # Default is False,
 
-    # single_column = False # Default is False,
-    # meaning it will retain the original column format
+    # single_column = False means the code will
+    # retain the original column format
     # of the paper (which is often double column).
-    # Set to True to change to single column
+    # Set it to True to change to single column
 
     # =============================================================================
     # Run main
