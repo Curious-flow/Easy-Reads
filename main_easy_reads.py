@@ -133,7 +133,8 @@ if __name__ == "__main__":
     #Make sure it's the main abstract page URL,
     #e.g. https://arxiv.org/abs/XXXX.YYYYY
 
-    url=""
+    url="Insert the arXiv URL here within quotes"
+    #Example: url="https://arxiv.org/abs/3605.08080"
 
     # Font and formatting settings 
     base_font_pt = 12 # Base font size (Recommended: 12)
