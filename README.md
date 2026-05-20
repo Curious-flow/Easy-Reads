@@ -45,7 +45,7 @@ You can customize the following parameters in `main_easy_reads.py` to suit your 
   - [TeX Live](https://www.tug.org/texlive/) (cross-platform)
   - [MiKTeX](https://miktex.org/) (cross-platform, easier installation)
     
-    When using MikTex, it is recommended to allow missing packages to installed automatically (on-thefly) under Settings ->
+    When using MikTex, it is recommended to allow missing packages to installed automatically (on-the-fly) under Settings ->
     General 
 
 
