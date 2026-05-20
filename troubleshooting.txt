@@ -1,0 +1,5 @@
+# Troubleshooting 
+# 1. Troubleshooting Output Issues
+# a. If facing issues related to figures/tables/equations being too large or getting clipped or spilling into an unexpected
+# area of the text, try either reducing the font size (ex: to 11/10) or switching between single column set to True/False.
+
