@@ -33,10 +33,13 @@ requests>=2.31.0
 # Windows:
 #   - TeX Live or MiKTeX
 # macOS:
-#   - MacTeX (recommended)
 #   - TeX Live or MiKTeX
+#   - MacTeX 
 # Linux (Debian/Ubuntu):
-#   - TeX Live via package manager (recommended)
+#   - TeX Live via package manager
 #     sudo apt-get install -y texlive-full
 #   - MiKTeX
+# Note:
+# When using MikTex, it is recommended to allow missing packages to installed automatically 
+# (on-the-fly) under Settings -> General
 
