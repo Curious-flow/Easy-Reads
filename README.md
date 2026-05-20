@@ -43,7 +43,10 @@ You can customize the following parameters in `main_easy_reads.py` to suit your 
 - **Python 3.x** - Download from [python.org](https://www.python.org/downloads/)
 - **LaTeX distribution** - Choose one of the following:
   - [TeX Live](https://www.tug.org/texlive/) (cross-platform)
-  - [MiKTeX](https://miktex.org/) (Windows-focused, easier installation)
+  - [MiKTeX](https://miktex.org/) (cross-platform, easier installation)
+    When using MikTex, it is recommended to allow missing packages to installed automatically (on-thefly) under Settings ->
+    General 
+
 
 - **Required Python packages:**
 
