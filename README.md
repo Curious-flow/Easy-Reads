@@ -10,28 +10,30 @@ The main goal of this initial release of Easy Reads is: Ease of Read.
 
 ## Motivation
 
-ArXiv papers use smaller fonts and double-column layouts optimized for print efficiency, which causes eye strain during digital reading and creates accessibility barriers. Zooming helps temporarily but doesn't fundamentally change the document—printed copies remain difficult to read.
+Scientific papers often use smaller fonts and double-column layouts, features that optimize print efficiency, but can strain the reader and causes accessibility issues. Zooming helps temporarily but doesn't fundamentally change the document—printed copies remain difficult to read. 
 
-**Easy Reads** solves this by editing the LaTeX source to generate a new PDF with larger fonts, better line spacing, and optional single-column formatting. This makes papers more readable both digitally and in print, and improves accessibility for people with visual impairments.
+**Easy Reads** solves this by making scientific papers from arXiv more reader friendly. By editing the LaTeX source to generate a new PDF with larger fonts, better line spacing, and optional single-column formatting, the final paper is more reader friendly both digitally and in print, and this also improves accessibility of the paper.
 
 ## Features
 
-- **[↓] Paper Download**: Automatically downloads ArXiv papers from URLs
-- **[T] LaTeX Processing**: Extracts and processes LaTeX source files
-- **[A] Font Tuning**: Automatically adjusts font sizes and line spacing and optionally switch to single column text format for better readability
-- **[✓] PDF Compilation**: Compiles LaTeX to PDF with proper bibliography handling
-- **[*] User-Friendly**: Simple one-command execution with minimal setup
+- **📥 Paper Download**: Automatically downloads ArXiv papers from URLs
+- **🔧 LaTeX Processing**: Extracts and processes LaTeX source files
+- **🎨 Font Tuning**: Automatically adjusts font sizes and line spacing and optionally switch to single column text format for better readability
+- **✅ PDF Compilation**: Compiles LaTeX to PDF with proper bibliography handling
+- **🚀 User-Friendly**: Simple one-command execution with minimal setup
 
 ## Configuration
 
-You can customize the following parameters to suit your reading preferences. Parameters can be set either **via CLI arguments (recommended)** or in the `main_easy_reads.py` file:
+You can customize the following parameters to suit your reading preferences. Parameters can be set either **via CLI arguments (recommended)** or by editing variables in `main_easy_reads.py`:
 
-| Parameter | CLI Argument | Description | Default Value |
-|-----------|--------------|-------------|----------------|
-| `base_font_pt` | `--font-size` | Base font size in points | `12` (recommended) |
-| `baseline_pt` | `--baseline` | Line spacing in points | `1.2 * base_font_pt` (auto-calculated) |
-| `single_column` | `--single-column` | Enable single-column formatting | `False` |
-| `single_column_margin` | `--single-column-margin` | Margin width in inches for single-column mode | `None` (auto-scales with font size) |
+| Code Variable | CLI Argument | Description | Default Value |
+|---------------|--------------|-------------|----------------|
+| `URL` | `--url` | ArXiv paper URL | (empty - required) |
+| `FONT_SIZE` | `--font-size` | Base font size in points | `12` (recommended) |
+| `SINGLE_COLUMN` | `--single-column` | Enable single-column formatting | `False` |
+| `SINGLE_COLUMN_MARGIN` | `--single-column-margin` | Margin width in inches for single-column mode | `None` (auto-scales with font size) |
+
+*Note: Line spacing (`baseline_pt`) is auto-calculated as `1.2 * FONT_SIZE` unless overridden with `--baseline`.*
 
 ## Requirements
 
@@ -56,7 +58,7 @@ The program takes an ArXiv URL and outputs a formatted PDF to `Formatted Papers/
 
 ### Two Ways to Use Easy Reads
 
-#### **Option 1: Command Line (Recommended)** [*]
+#### **Option 1: Command Line (Recommended)** 💻
 
 Pass parameters directly via CLI arguments. This is the recommended approach for flexibility and ease of use.
 
@@ -106,7 +108,7 @@ For users with consistent preferences or frequent usage, edit the hardcoded defa
 2. Locate the settings section (around line 224):
 ```python
 URL = ""  # Enter ArXiv URL here
-FONT_SIZE = 12  # Enter Base Font s=Size Here(Recommended: 12)
+FONT_SIZE = 12  # Base font size (Recommended: 12)
 SINGLE_COLUMN = False  # Set to True for single-column formatting
 SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (1.5" at 12pt), or enter custom value in inches
 ```
