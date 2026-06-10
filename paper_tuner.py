@@ -20,6 +20,13 @@ TUNING_BLOCK_TEMPLATE = r"""
 % === END AUTO FONT/FIG TUNING ================================================
 """.lstrip("\n")
 
+# Margin tuning for single-column mode to avoid excessively long lines
+SINGLE_COLUMN_MARGIN_TEMPLATE = r"""
+% === SINGLE COLUMN MARGIN TUNING (inserted by script) =======================
+\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
+% ============================================================================
+""".lstrip("\n")
+
 
 def _normalize_pt_value(value) -> str:
     """Return a numeric string for TeX point dimensions (without the 'pt' suffix)."""
@@ -34,6 +41,7 @@ def set_tuning_values_newfile(
     base_font_pt=None,
     baseline_pt=None,
     single_column: bool = False,
+    single_column_margin=None,
 ) -> str:
     with open(tex_path, "r", encoding="utf-8", errors="ignore") as f:
         tex = f.read()
@@ -74,6 +82,13 @@ def set_tuning_values_newfile(
 
     # Single column: remove twocolumn from documentclass options and inject \onecolumn
     if single_column:
+        # Calculate effective margin (scales with font size)
+        # Base: 1.5" margin at 12pt, scales inversely with font size
+        if single_column_margin is None:
+            effective_margin = 1.5 * (12.0 / float(_normalize_pt_value(resolved_base_font_pt)))
+        else:
+            effective_margin = single_column_margin
+        
         # Remove twocolumn from \documentclass[...] options
         new_tex = re.sub(
             r'(\\documentclass\[)([^\]]*)(\])',
@@ -86,7 +101,25 @@ def set_tuning_values_newfile(
             r'\1\n\\onecolumn',
             new_tex,
         )
-        print("📐 Single column mode applied")
+        
+        # Generate margin template with calculated margin value
+        margin_template = f"""
+% === SINGLE COLUMN MARGIN TUNING (inserted by script) =======================
+\\usepackage[hmargin={effective_margin:.2f}in,vmargin=1in]{{geometry}}
+% ============================================================================
+""".lstrip("\n")
+        
+        # Inject margin settings right after documentclass (before tuning block if possible)
+        # This ensures geometry package is loaded before any potential conflicts
+        m = re.search(
+            r"^[ \t]*\\(?:documentclass|documentstyle)(?:\[[^\]]*\])?\{[^\}]+\}",
+            new_tex,
+            flags=re.MULTILINE,
+        )
+        if m:
+            new_tex = new_tex[:m.end()] + "\n" + margin_template + "\n" + new_tex[m.end():]
+        
+        print(f"📐 Single column mode applied with {effective_margin:.2f}in margins")
 
     root, ext = os.path.splitext(tex_path)
 

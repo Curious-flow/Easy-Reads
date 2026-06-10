@@ -17,7 +17,7 @@ from paper_downloader import download_file, extract_tar, find_largest_tex, repla
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
 
-def main(url, base_font_pt, baseline_pt, single_column=False):
+def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None):
 
     """
     Main processing pipeline for Easy Reads.
@@ -88,6 +88,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         base_font_pt=base_font_pt,
         baseline_pt=baseline_pt,
         single_column=single_column,
+        single_column_margin=single_column_margin,
     )
     print("=" * 60 + "\n")
     
@@ -160,6 +161,12 @@ Examples:
         default=default_single_column,
         help="Enable single-column formatting (default: False)"
     )
+    parser.add_argument(
+        "--single-column-margin",
+        type=float,
+        default=None,
+        help="Custom margin width in inches for single-column mode (default: auto-scaled from font size)"
+    )
 
     args = parser.parse_args()
 
@@ -168,11 +175,12 @@ Examples:
     final_base_font_pt = args.font_size
     final_baseline_pt = args.baseline if args.baseline is not None else (1.2 * final_base_font_pt)
     final_single_column = args.single_column
+    final_single_column_margin = args.single_column_margin
 
-    return final_url, final_base_font_pt, final_baseline_pt, final_single_column
+    return final_url, final_base_font_pt, final_baseline_pt, final_single_column, final_single_column_margin
 
 
-def display_settings(url, base_font_pt, baseline_pt, single_column):
+def display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin=None):
     """
     Display the configuration settings in a formatted banner.
     """
@@ -185,6 +193,13 @@ def display_settings(url, base_font_pt, baseline_pt, single_column):
     print(f"   Font Size: {base_font_pt} pt")
     print(f"   Line Spacing: {baseline_pt:.1f} pt")
     print(f"   Single Column: {single_column}")
+    if single_column:
+        # Calculate effective margin if not explicitly provided
+        if single_column_margin is None:
+            effective_margin = 1.5 * (12.0 / base_font_pt)
+        else:
+            effective_margin = single_column_margin
+        print(f"   Margins: {effective_margin:.2f}in (left/right), 1in (top/bottom)")
     print("=" * 60 + "\n")
 
 
@@ -214,11 +229,11 @@ if __name__ == "__main__":
     # Parse Arguments and Display Configuration
     # =============================================================================
 
-    url, base_font_pt, baseline_pt, single_column = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN)
-    display_settings(url, base_font_pt, baseline_pt, single_column)
+    url, base_font_pt, baseline_pt, single_column, single_column_margin = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN)
+    display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin)
 
     # =============================================================================
     # Run main
     # =============================================================================
 
-    main(url, base_font_pt, baseline_pt, single_column=single_column)
+    main(url, base_font_pt, baseline_pt, single_column=single_column, single_column_margin=single_column_margin)
