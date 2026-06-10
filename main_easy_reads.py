@@ -120,33 +120,11 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         print("=" * 60 + "\n")
 
 
-if __name__ == "__main__":
-
-    # ==========================================================
-    # ╔════════════════════════════════════════════════════════╗
-    # ║            Enter Settings Below Including:             ║
-    # ║          ArXiv URL of the paper, Font Size,            ║
-    # ║           Line Spacing (derived by default)            ║
-    # ║          Don't Tweak Rest of the Code!                 ║
-    # ╚════════════════════════════════════════════════════════╝
-    # ==========================================================
-
-    # HARDCODED DEFAULTS (used if no CLI args provided)
-
-    # ENTER ARXIV URL BELOW
-    # Make sure it's the main abstract page URL,
-    # Of the form: https://arxiv.org/abs/XXXX.YYYYY
-
-    # Example: URL="https://arxiv.org/abs/9000.12345"
-
-    URL = ""
-    DEFAULT_FONT_SIZE = 12  # Base font size (Recommended: 12)
-    DEFAULT_SINGLE_COLUMN = False
-
-    # =============================================================================
-    # Command-Line Argument Parser (Optional Override)
-    # =============================================================================
-
+def parse_arguments(url, base_font_pt, default_single_column):
+    """
+    Parse command-line arguments and resolve final configuration values.
+    CLI args override the provided hardcoded defaults.
+    """
     parser = argparse.ArgumentParser(
         description="Easy Reads - ArXiv Paper Processor",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -161,14 +139,14 @@ Examples:
     parser.add_argument(
         "--url",
         type=str,
-        default=URL,
-        help=f"ArXiv paper URL (default: {URL})"
+        default=url,
+        help=f"ArXiv paper URL (default: {url if url else 'none - enter via CLI'})"
     )
     parser.add_argument(
         "--font-size",
         type=int,
-        default=DEFAULT_FONT_SIZE,
-        help=f"Base font size in points (default: {DEFAULT_FONT_SIZE})"
+        default=base_font_pt,
+        help=f"Base font size in points (default: {base_font_pt})"
     )
     parser.add_argument(
         "--baseline",
@@ -179,22 +157,25 @@ Examples:
     parser.add_argument(
         "--single-column",
         action="store_true",
-        default=DEFAULT_SINGLE_COLUMN,
+        default=default_single_column,
         help="Enable single-column formatting (default: False)"
     )
 
     args = parser.parse_args()
 
     # Resolve final values (CLI args override defaults)
-    url = args.url
-    base_font_pt = args.font_size
-    baseline_pt = args.baseline if args.baseline is not None else (1.2 * base_font_pt)
-    single_column = args.single_column
+    final_url = args.url
+    final_base_font_pt = args.font_size
+    final_baseline_pt = args.baseline if args.baseline is not None else (1.2 * final_base_font_pt)
+    final_single_column = args.single_column
 
-    # =============================================================================
-    # Display Banner and Configuration
-    # =============================================================================
+    return final_url, final_base_font_pt, final_baseline_pt, final_single_column
 
+
+def display_settings(url, base_font_pt, baseline_pt, single_column):
+    """
+    Display the configuration settings in a formatted banner.
+    """
     print("\n" + "=" * 60)
     print("🚀 Easy Reads - ArXiv Paper Processor")
     print("=" * 60)
@@ -205,6 +186,36 @@ Examples:
     print(f"   Line Spacing: {baseline_pt:.1f} pt")
     print(f"   Single Column: {single_column}")
     print("=" * 60 + "\n")
+
+
+if __name__ == "__main__":
+
+    # ==========================================================
+    # ╔════════════════════════════════════════════════════════╗
+    # ║                 ENTER SETTINGS BELOW:                  ║
+    # ║          ArXiv URL of the paper, Font Size,            ║
+    # ║           Line Spacing (derived by default)            ║
+    # ║             Don't Modify Code elsewhere                ║
+    # ╚════════════════════════════════════════════════════════╝
+    # ==========================================================
+
+    # HARDCODED DEFAULTS (modify these before running)
+
+    # ENTER ARXIV URL BELOW
+    # Make sure it's the main abstract page URL,
+    # Of the form: https://arxiv.org/abs/XXXX.YYYYY
+    # Example: URL="https://arxiv.org/abs/9000.12345"
+
+    URL = ""
+    FONT_SIZE = 12  # Base font size (Recommended: 12)
+    SINGLE_COLUMN = False  # Set to True for single-column formatting
+
+    # =============================================================================
+    # Parse Arguments and Display Configuration
+    # =============================================================================
+
+    url, base_font_pt, baseline_pt, single_column = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN)
+    display_settings(url, base_font_pt, baseline_pt, single_column)
 
     # =============================================================================
     # Run main
