@@ -121,7 +121,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         print("=" * 60 + "\n")
 
 
-def parse_arguments(url, base_font_pt, default_single_column):
+def parse_arguments(url, base_font_pt, default_single_column, default_single_column_margin=None):
     """
     Parse command-line arguments and resolve final configuration values.
     CLI args override the provided hardcoded defaults.
@@ -164,7 +164,7 @@ Examples:
     parser.add_argument(
         "--single-column-margin",
         type=float,
-        default=None,
+        default=default_single_column_margin,
         help="Custom margin width in inches for single-column mode (default: auto-scaled from font size)"
     )
 
@@ -224,12 +224,13 @@ if __name__ == "__main__":
     URL = ""
     FONT_SIZE = 12  # Base font size (Recommended: 12)
     SINGLE_COLUMN = False  # Set to True for single-column formatting
+    SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (Default is 1.5" for Font Size of 12pt), or enter custom value in inches.
 
     # =============================================================================
     # Parse Arguments and Display Configuration
     # =============================================================================
 
-    url, base_font_pt, baseline_pt, single_column, single_column_margin = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN)
+    url, base_font_pt, baseline_pt, single_column, single_column_margin = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN, SINGLE_COLUMN_MARGIN)
     display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin)
 
     # =============================================================================
