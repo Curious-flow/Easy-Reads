@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import urllib.request
+import argparse
 
 import paper_downloader
 import paper_tuner
@@ -22,23 +23,16 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     Main processing pipeline for Easy Reads.
     """
 
-    # Display Banner
-    print("\n" + "=" * 50)
-    print("🚀 Easy Reads - ArXiv Paper Processor")
-    print("=" * 50)
-    #print("\n")
-
     # Step 1. Download Paper
-
-    print("URL is", url)
-    print("\n")
 
     # Keep project root clean by storing all downloaded artifacts in Downloads/
     project_root = os.path.dirname(os.path.abspath(__file__))
     downloads_dir = os.path.join(project_root, "Downloads")
     os.makedirs(downloads_dir, exist_ok=True)
 
+    print("=" * 60)
     print("📥 Downloading paper...")
+    print("=" * 60)
     raw_id = url.rstrip("/").split("/")[-1]  # e.g. "3605.08080" or "3605.08080v2"
     version_match = re.search(r'(v\d+)$', raw_id)
     if version_match:
@@ -57,7 +51,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
             version_str = ""
     print(f"arXiv ID: {paper_id}  Version: {version_str}")
     tar_path = download_file(url, save_as=os.path.join(downloads_dir, f"{paper_id}.tar.gz"))
-    print("\n")
+    print("=" * 60 + "\n")
 
     # Derive folder name from URL (e.g., Just arXiv ID)
     # rstrip removes trailing slash
@@ -65,10 +59,11 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
 
     folder_name = paper_id
     paper_folder = os.path.join(downloads_dir, folder_name)
-    #print("\n")
 
     # Step 2. Extract the Paper | Unzip the downloaded tar.gz file
+    print("=" * 60)
     extract_tar(tar_path, paper_folder)
+    print("=" * 60 + "\n")
     
     # Step 3. Find and process the Largest LaTeX file (the main paper source file)
     # There may be other latex files but those are not relevant.
@@ -85,18 +80,23 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
     tex_with_class = replace_missing_document_class(largest_tex)
 
     # Apply formatting improvements
-    print("\n")
+    print("=" * 60)
     print("🎨 Applying formatting improvements...")
+    print("=" * 60)
     new_tex = set_tuning_values_newfile(
         tex_with_class,
         base_font_pt=base_font_pt,
         baseline_pt=baseline_pt,
         single_column=single_column,
     )
+    print("=" * 60 + "\n")
     
     # Compile to PDF
+    print("=" * 60)
     print("📄 Compiling to PDF...")
+    print("=" * 60)
     pdf_path = compile_with_multiple_passes(new_tex)
+    print("=" * 60 + "\n")
     
     if pdf_path:
         # Move PDF to Formatted Papers folder with arxiv ID naming
@@ -111,11 +111,13 @@ def main(url, base_font_pt, baseline_pt, single_column=False):
         import shutil
         shutil.move(pdf_path, final_pdf_path)
         
-        print(f"\n🎉 Success! Your PDF is ready: {final_pdf_path}")
-        print("\n")
+        print("=" * 60)
+        print(f"🎉 Success! Your PDF is ready: {final_pdf_path}")
+        print("=" * 60 + "\n")
     else:
-        print("\n❌ Processing failed. Check error messages above.")
-        print("\n")
+        print("=" * 60)
+        print("❌ Processing failed. Check error messages above.")
+        print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":
@@ -129,23 +131,80 @@ if __name__ == "__main__":
     # ╚════════════════════════════════════════════════════════╝
     # ==========================================================
 
-    #ENTER ARXIV URL HERE
-    #Make sure it's the main abstract page URL,
-    #e.g. https://arxiv.org/abs/XXXX.YYYYY
+    # HARDCODED DEFAULTS (used if no CLI args provided)
 
-    url="Insert the arXiv URL here within quotes"
-    #Example: url="https://arxiv.org/abs/3605.08080"
+    # ENTER ARXIV URL BELOW
+    # Make sure it's the main abstract page URL,
+    # Of the form: https://arxiv.org/abs/XXXX.YYYYY
 
-    # Font and formatting settings 
-    base_font_pt = 12 # Base font size (Recommended: 12)
-    baseline_pt = 1.2* base_font_pt # Line spacing
+    # Example: URL="https://arxiv.org/abs/9000.12345"
 
-    single_column = False # Default is False,
+    URL = ""
+    DEFAULT_FONT_SIZE = 12  # Base font size (Recommended: 12)
+    DEFAULT_SINGLE_COLUMN = False
 
-    # single_column = False means the code will
-    # retain the original column format
-    # of the paper (which is often double column).
-    # Set it to True to change to single column
+    # =============================================================================
+    # Command-Line Argument Parser (Optional Override)
+    # =============================================================================
+
+    parser = argparse.ArgumentParser(
+        description="Easy Reads - ArXiv Paper Processor",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main_easy_reads.py
+  python main_easy_reads.py --url https://arxiv.org/abs/9000.12345 --font-size 14
+  python main_easy_reads.py --url https://arxiv.org/abs/9000.12345 --single-column
+        """
+    )
+
+    parser.add_argument(
+        "--url",
+        type=str,
+        default=URL,
+        help=f"ArXiv paper URL (default: {URL})"
+    )
+    parser.add_argument(
+        "--font-size",
+        type=int,
+        default=DEFAULT_FONT_SIZE,
+        help=f"Base font size in points (default: {DEFAULT_FONT_SIZE})"
+    )
+    parser.add_argument(
+        "--baseline",
+        type=float,
+        default=None,
+        help="Line spacing in points (default: 1.2 * font-size, auto-calculated)"
+    )
+    parser.add_argument(
+        "--single-column",
+        action="store_true",
+        default=DEFAULT_SINGLE_COLUMN,
+        help="Enable single-column formatting (default: False)"
+    )
+
+    args = parser.parse_args()
+
+    # Resolve final values (CLI args override defaults)
+    url = args.url
+    base_font_pt = args.font_size
+    baseline_pt = args.baseline if args.baseline is not None else (1.2 * base_font_pt)
+    single_column = args.single_column
+
+    # =============================================================================
+    # Display Banner and Configuration
+    # =============================================================================
+
+    print("\n" + "=" * 60)
+    print("🚀 Easy Reads - ArXiv Paper Processor")
+    print("=" * 60)
+    print("📋 Paper Settings")
+    print("=" * 60)
+    print(f"   URL: {url}")
+    print(f"   Font Size: {base_font_pt} pt")
+    print(f"   Line Spacing: {baseline_pt:.1f} pt")
+    print(f"   Single Column: {single_column}")
+    print("=" * 60 + "\n")
 
     # =============================================================================
     # Run main
