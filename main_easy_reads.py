@@ -17,7 +17,7 @@ from paper_downloader import download_file, extract_tar, find_largest_tex, repla
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
 
-def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None):
+def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None, output_suffix="_easy"):
 
     """
     Main processing pipeline for Easy Reads.
@@ -104,8 +104,8 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         formatted_papers_dir = os.path.join(project_root, "Formatted Papers")
         os.makedirs(formatted_papers_dir, exist_ok=True)
         
-        # Rename to arxiv_idvN_easy.pdf
-        final_pdf_name = f"{paper_id}{version_str}_easy.pdf"
+        # Rename with custom suffix (default: _easy)
+        final_pdf_name = f"{paper_id}{version_str}{output_suffix}.pdf"
         final_pdf_path = os.path.join(formatted_papers_dir, final_pdf_name)
         
         # Move the PDF from /Downloads to /Formatted Papers
@@ -121,7 +121,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         print("=" * 60 + "\n")
 
 
-def parse_arguments(url, base_font_pt, default_single_column, default_single_column_margin=None):
+def parse_arguments(url, base_font_pt, default_baseline, default_single_column, default_single_column_margin=None, default_output_suffix="_easy"):
     """
     Parse command-line arguments and resolve final configuration values.
     CLI args override the provided hardcoded defaults.
@@ -152,7 +152,7 @@ Examples:
     parser.add_argument(
         "--baseline",
         type=float,
-        default=None,
+        default=default_baseline,
         help="Line spacing in points (default: 1.2 * font-size, auto-calculated)"
     )
     parser.add_argument(
@@ -167,6 +167,12 @@ Examples:
         default=default_single_column_margin,
         help="Custom margin width in inches for single-column mode (default: auto-scaled from font size)"
     )
+    parser.add_argument(
+        "--output-suffix",
+        type=str,
+        default=default_output_suffix,
+        help="Suffix for output filename (default: _easy)"
+    )
 
     args = parser.parse_args()
 
@@ -176,11 +182,12 @@ Examples:
     final_baseline_pt = args.baseline if args.baseline is not None else (1.2 * final_base_font_pt)
     final_single_column = args.single_column
     final_single_column_margin = args.single_column_margin
+    final_output_suffix = args.output_suffix
 
-    return final_url, final_base_font_pt, final_baseline_pt, final_single_column, final_single_column_margin
+    return final_url, final_base_font_pt, final_baseline_pt, final_single_column, final_single_column_margin, final_output_suffix
 
 
-def display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin=None):
+def display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin=None, output_suffix="_easy"):
     """
     Display the configuration settings in a formatted banner.
     """
@@ -200,6 +207,7 @@ def display_settings(url, base_font_pt, baseline_pt, single_column, single_colum
         else:
             effective_margin = single_column_margin
         print(f"   Margins: {effective_margin:.2f}in (left/right), 1in (top/bottom)")
+    print(f"   Output Suffix: {output_suffix}")
     print("=" * 60 + "\n")
 
 
@@ -223,18 +231,20 @@ if __name__ == "__main__":
 
     URL = ""
     FONT_SIZE = 12  # Base font size (Recommended: 12)
+    BASELINE = None  # Line spacing in points (default: 1.2 * font size, auto-calculated), or enter custom value
     SINGLE_COLUMN = False  # Set to True for single-column formatting
     SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (Default is 1.5" for Font Size of 12pt), or enter custom value in inches.
+    OUTPUT_SUFFIX = "_easy"  # Suffix for output filename (e.g., "_formatted", "_readable", or "" for no suffix)
 
     # =============================================================================
     # Parse Arguments and Display Configuration
     # =============================================================================
 
-    url, base_font_pt, baseline_pt, single_column, single_column_margin = parse_arguments(URL, FONT_SIZE, SINGLE_COLUMN, SINGLE_COLUMN_MARGIN)
-    display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin)
+    url, base_font_pt, baseline_pt, single_column, single_column_margin, output_suffix = parse_arguments(URL, FONT_SIZE, BASELINE, SINGLE_COLUMN, SINGLE_COLUMN_MARGIN, OUTPUT_SUFFIX)
+    display_settings(url, base_font_pt, baseline_pt, single_column, single_column_margin, output_suffix)
 
     # =============================================================================
     # Run main
     # =============================================================================
 
-    main(url, base_font_pt, baseline_pt, single_column=single_column, single_column_margin=single_column_margin)
+    main(url, base_font_pt, baseline_pt, single_column=single_column, single_column_margin=single_column_margin, output_suffix=output_suffix)

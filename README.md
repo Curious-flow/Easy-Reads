@@ -58,8 +58,7 @@ python main_easy_reads.py --url https://arxiv.org/abs/XXXX.YYYYY
 | `--font-size` | Base font size in points | `12` | `--font-size 14` |
 | `--single-column` | Enable single-column formatting (flag, no value needed) | `False` | `--single-column` |
 | `--single-column-margin` | Custom margin width in inches for single-column mode | `None` (auto-scales) | `--single-column-margin 1.3` |
-| `--baseline` | Line spacing in points | Auto-calculated (1.2 × font size) | `--baseline 18` |
-
+| `--baseline` | Line spacing in points | Auto-calculated (1.2 × font size) | `--baseline 18` || `--output-suffix` | Suffix for output filename | `_easy` | `--output-suffix _formatted` |
 **Example of Single Command Execution:**
 
 ```bash
@@ -71,6 +70,9 @@ python main_easy_reads.py --url https://arxiv.org/abs/XXXX.YYYY --single-column
 
 # Single-column with custom margin (in inches)
 python main_easy_reads.py --url https://arxiv.org/abs/XXXX.YYYY --single-column --single-column-margin 1.3
+
+# Adding a Custom suffix for the output file
+python main_easy_reads.py --url https://arxiv.org/abs/XXXX.YYYY --output-suffix _formatted
 ```
 
 ---
@@ -84,8 +86,10 @@ For users with consistent preferences or frequent usage, edit the hardcoded defa
 ```python
 URL = ""  # Enter ArXiv URL here
 FONT_SIZE = 12  # Base font size (Default Size: 12)
+BASELINE = None  # Line spacing in points (default: 1.2 * font size, auto-calculated), or enter custom value
 SINGLE_COLUMN = False  # Set to True for single-column formatting
 SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (1.5" at 12pt), or enter custom value in inches
+OUTPUT_SUFFIX = "_easy"  # Suffix for output filename (can change to e.g., "_formatted", "_readable", etc., or "" for no suffix)
 ```
 
 3. Modify the values to your preferences.
