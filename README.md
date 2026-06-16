@@ -89,7 +89,7 @@ FONT_SIZE = 12  # Base font size (Default Size: 12)
 BASELINE = None  # Line spacing in points (default: 1.2 * font size, auto-calculated), or enter custom value
 SINGLE_COLUMN = False  # Set to True for single-column formatting
 SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (1.5" at 12pt), or enter custom value in inches
-OUTPUT_SUFFIX = "_easy"  # Suffix for output filename (can change to e.g., "_formatted", "_readable", etc., or "" for no suffix)
+OUTPUT_SUFFIX = "_formatted"  # Suffix for output filename (can change to e.g., "_easy", "_readable", etc., or "" for no suffix)
 ```
 
 3. Modify the values to your preferences.
