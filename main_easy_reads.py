@@ -234,7 +234,7 @@ if __name__ == "__main__":
     BASELINE = None  # Line spacing in points (default: 1.2 * font size, auto-calculated), or enter custom value
     SINGLE_COLUMN = False  # Set to True for single-column formatting
     SINGLE_COLUMN_MARGIN = None  # Set to None for auto-scaling (Default is 1.5" for Font Size of 12pt), or enter custom value in inches.
-    OUTPUT_SUFFIX = "_easy"  # Suffix for output filename (e.g., "_formatted", "_readable", or "" for no suffix)
+    OUTPUT_SUFFIX = "_formatted"  # Suffix for output filename (e.g., "_easy", "_readable", or "" for no suffix)
 
     # =============================================================================
     # Parse Arguments and Display Configuration
