@@ -83,9 +83,16 @@ def set_tuning_values_newfile(
     else:
         new_tex = tex[: block_match.start()] + tuned_block + tex[block_match.end():]
 
-    # Single column: remove twocolumn from documentclass options
+    # Single column: remove twocolumn from documentclass options if present, and inject single-column commands
     # NOTE: Margin application disabled temporarily for debugging
     if single_column:
+        # Detect document class
+        docclass_match = re.search(r'\\documentclass(?:\[[^\]]*\])?\{([^}]+)\}', new_tex)
+        if docclass_match:
+            doc_class = docclass_match.group(1).strip()
+        else:
+            doc_class = "unknown"
+        
         # Calculate effective margin (scales with font size)
         # Base: 1.5" margin at 12pt, scales inversely with font size
         if single_column_margin is None:
@@ -93,14 +100,14 @@ def set_tuning_values_newfile(
         else:
             margin_value = single_column_margin
         
-        # Remove twocolumn from \documentclass[...] options
+        # Remove twocolumn from \documentclass[...] options if present
         new_tex = re.sub(
             r'(\\documentclass\[)([^\]]*)(\])',
             lambda m: m.group(1) + re.sub(r',?\btwocolumn\b,?', lambda mm: ',' if mm.group(0).count(',') == 2 else '', m.group(2)).strip(',') + m.group(3),
             new_tex,
         )
         
-        # Set onecolumn after \begin{document} (only if not in a comment)
+        # Add \onecolumn after \begin{document} for all classes
         new_tex = re.sub(
             r'^([ \t]*)\\begin\{document\}',
             r'\1\\begin{document}\n\\onecolumn',
@@ -108,15 +115,15 @@ def set_tuning_values_newfile(
             flags=re.MULTILINE,
         )
         
-        print(f"✅ Single column mode applied (margins disabled for debugging)")
+        print(f"✅ Single column mode applied for {doc_class}")
 
     root, ext = os.path.splitext(tex_path)
 
-    # ✅ If filename already ends with _easy, overwrite it
-    if root.endswith("_easy"):
+    # ✅ If filename already ends with _formatted, overwrite it
+    if root.endswith("_formatted"):
         new_path = tex_path
     else:
-        new_path = root + "_easy" + ext
+        new_path = root + "_formatted" + ext
 
     with open(new_path, "w", encoding="utf-8", errors="ignore") as f:
         f.write(new_tex)

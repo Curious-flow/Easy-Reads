@@ -17,7 +17,7 @@ from paper_downloader import download_file, extract_tar, find_largest_tex, repla
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
 
-def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None, output_suffix="_easy"):
+def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None, output_suffix="_formatted"):
 
     """
     Main processing pipeline for Easy Reads.
@@ -121,7 +121,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         print("=" * 60 + "\n")
 
 
-def parse_arguments(url, base_font_pt, default_baseline, default_single_column, default_single_column_margin=None, default_output_suffix="_easy"):
+def parse_arguments(url, base_font_pt, default_baseline, default_single_column, default_single_column_margin=None, default_output_suffix="_formatted"):
     """
     Parse command-line arguments and resolve final configuration values.
     CLI args override the provided hardcoded defaults.
