@@ -20,13 +20,16 @@ TUNING_BLOCK_TEMPLATE = r"""
 % === END AUTO FONT/FIG TUNING ================================================
 """.lstrip("\n")
 
-# Margin tuning for single-column mode to avoid excessively long lines
+# Margin tuning for single-column mode
+# Load geometry package with explicit margins to override AASTeX defaults
 SINGLE_COLUMN_MARGIN_TEMPLATE = r"""
-% === SINGLE COLUMN MARGIN TUNING (inserted by script) =======================
-\usepackage[hmargin=1.5in,vmargin=1in]{geometry}
-% ============================================================================
+\usepackage[left=__MARGIN_IN__in,right=__MARGIN_IN__in,top=1in,bottom=1in]{geometry}
 """.lstrip("\n")
 
+# Use \newgeometry{} command to reset margins after document starts
+SINGLE_COLUMN_GEOMETRY_RESET = r"""
+\newgeometry{left=__MARGIN_IN__in,right=__MARGIN_IN__in,top=1in,bottom=1in}
+""".lstrip("\n")
 
 def _normalize_pt_value(value) -> str:
     """Return a numeric string for TeX point dimensions (without the 'pt' suffix)."""
@@ -80,14 +83,15 @@ def set_tuning_values_newfile(
     else:
         new_tex = tex[: block_match.start()] + tuned_block + tex[block_match.end():]
 
-    # Single column: remove twocolumn from documentclass options and inject \onecolumn
+    # Single column: remove twocolumn from documentclass options
+    # NOTE: Margin application disabled temporarily for debugging
     if single_column:
         # Calculate effective margin (scales with font size)
         # Base: 1.5" margin at 12pt, scales inversely with font size
         if single_column_margin is None:
-            effective_margin = 1.5 * (12.0 / float(_normalize_pt_value(resolved_base_font_pt)))
+            margin_value = 1.5 * (12.0 / float(_normalize_pt_value(resolved_base_font_pt)))
         else:
-            effective_margin = single_column_margin
+            margin_value = single_column_margin
         
         # Remove twocolumn from \documentclass[...] options
         new_tex = re.sub(
@@ -95,31 +99,16 @@ def set_tuning_values_newfile(
             lambda m: m.group(1) + re.sub(r',?\btwocolumn\b,?', lambda mm: ',' if mm.group(0).count(',') == 2 else '', m.group(2)).strip(',') + m.group(3),
             new_tex,
         )
-        # Inject \onecolumn right after \begin{document}
+        
+        # Set onecolumn after \begin{document} (only if not in a comment)
         new_tex = re.sub(
-            r'(\\begin\{document\})',
-            r'\1\n\\onecolumn',
-            new_tex,
-        )
-        
-        # Generate margin template with calculated margin value
-        margin_template = f"""
-% === SINGLE COLUMN MARGIN TUNING (inserted by script) =======================
-\\usepackage[hmargin={effective_margin:.2f}in,vmargin=1in]{{geometry}}
-% ============================================================================
-""".lstrip("\n")
-        
-        # Inject margin settings right after documentclass (before tuning block if possible)
-        # This ensures geometry package is loaded before any potential conflicts
-        m = re.search(
-            r"^[ \t]*\\(?:documentclass|documentstyle)(?:\[[^\]]*\])?\{[^\}]+\}",
+            r'^([ \t]*)\\begin\{document\}',
+            r'\1\\begin{document}\n\\onecolumn',
             new_tex,
             flags=re.MULTILINE,
         )
-        if m:
-            new_tex = new_tex[:m.end()] + "\n" + margin_template + "\n" + new_tex[m.end():]
         
-        print(f"📐 Single column mode applied with {effective_margin:.2f}in margins")
+        print(f"✅ Single column mode applied (margins disabled for debugging)")
 
     root, ext = os.path.splitext(tex_path)
 
