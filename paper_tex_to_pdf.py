@@ -1,6 +1,7 @@
 import os
 import subprocess
 import re
+import shutil
 
 # Common journal class files that might not be installed
 JOURNAL_CLASS_MAPPING = {
@@ -130,8 +131,21 @@ def compile_with_multiple_passes(tex_file_path, output_dir=None):
                     if result2.stderr:
                         print(f"      {result2.stderr[:200]}")
             else:
-                print("   Pass 2: No .bib file found, skipping bibtex")
-                print("   ℹ️  If you have citations, make sure a .bib file exists in the same directory")
+                original_name = re.sub(
+                    r'(?:_easy|_formatted)+$', '', tex_name
+                )
+                supplied_bbl = os.path.join(
+                    os.path.dirname(current_tex_path),
+                    original_name + '.bbl',
+                )
+                target_bbl = os.path.join(compile_dir, tex_name + '.bbl')
+
+                if os.path.isfile(supplied_bbl):
+                    if os.path.abspath(supplied_bbl) != os.path.abspath(target_bbl):
+                        shutil.copy2(supplied_bbl, target_bbl)
+                    print("   Pass 2: Using supplied bibliography (.bbl)")
+                else:
+                    print("   Pass 2: No .bib or supplied .bbl found")
 
             print("   Pass 3: pdflatex (bibliography)")
             subprocess.run([

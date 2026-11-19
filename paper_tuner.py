@@ -39,6 +39,45 @@ def _normalize_pt_value(value) -> str:
     return text
 
 
+def _repair_mnras_author_footnotes(tex: str) -> str:
+    """Move simple author footnotes out of superscript math in MNRAS sources."""
+    if not re.search(
+        r"^[ \t]*\\documentclass(?:\[[^\]]*\])?\{mnras\}", tex, re.MULTILINE
+    ):
+        return tex
+
+    author = re.search(r"^[ \t]*\\author(?:\[[^\]]*\])?\{", tex, re.MULTILINE)
+    if not author:
+        return tex
+
+    # Locate the complete author argument, including nested TeX groups.
+    start = author.end()
+    depth, end = 1, start
+    while end < len(tex) and depth:
+        if tex[end] == "\\":
+            end += 2
+            continue
+        if tex[end] == "%":
+            newline = tex.find("\n", end)
+            end = len(tex) if newline == -1 else newline + 1
+            continue
+        if tex[end] == "{":
+            depth += 1
+        elif tex[end] == "}":
+            depth -= 1
+        end += 1
+    if depth:
+        return tex
+
+    author_text = tex[start:end - 1]
+    author_text = re.sub(
+        r"(\$\^\{[^{}$\n]+\})(\\thanks\{[^{}\n]*\})([ \t]*,?)[ \t]*\$",
+        lambda match: match[1] + "$" + match[2] + match[3],
+        author_text,
+    )
+    return tex[:start] + author_text + tex[end - 1:]
+
+
 def set_tuning_values_newfile(
     tex_path: str,
     base_font_pt=None,
@@ -48,6 +87,8 @@ def set_tuning_values_newfile(
 ) -> str:
     with open(tex_path, "r", encoding="utf-8", errors="ignore") as f:
         tex = f.read()
+
+    tex = _repair_mnras_author_footnotes(tex)
 
     resolved_base_font_pt = 12 if base_font_pt is None else base_font_pt
     if baseline_pt is None:
