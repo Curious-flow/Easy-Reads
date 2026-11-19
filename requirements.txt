@@ -23,6 +23,8 @@ requests>=2.31.0
 # bibliography)_:
 #   - pdflatex
 #   - bibtex
+#   - pdftotext (Poppler; reads original printed draft/preprint dates)
+# If pdftotext is unavailable, known automatic draft-date lines are omitted.
 #
 # Install ONE of these LaTeX distributions:
 #   - MiKTeX: available for Windows, macOS, and Linux

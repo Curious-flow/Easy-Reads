@@ -1,5 +1,6 @@
 import re
 import os
+from paper_metadata import preserve_original_date
 
 
 TUNING_BLOCK_TEMPLATE = r"""
@@ -84,6 +85,7 @@ def set_tuning_values_newfile(
     baseline_pt=None,
     single_column: bool = False,
     single_column_margin=None,
+    original_printed_date=None,
 ) -> str:
     with open(tex_path, "r", encoding="utf-8", errors="ignore") as f:
         tex = f.read()
@@ -157,6 +159,8 @@ def set_tuning_values_newfile(
         )
         
         print(f"✅ Single column mode applied for {doc_class}")
+
+    new_tex = preserve_original_date(new_tex, original_printed_date)
 
     root, ext = os.path.splitext(tex_path)
 

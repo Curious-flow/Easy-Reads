@@ -8,6 +8,7 @@ import sys
 import re
 import urllib.request
 import argparse
+import json
 
 import paper_downloader
 import paper_tuner
@@ -16,6 +17,7 @@ import paper_tex_to_pdf
 from paper_downloader import download_file, extract_tar, find_largest_tex, replace_missing_document_class
 from paper_tuner import set_tuning_values_newfile
 from paper_tex_to_pdf import compile_with_multiple_passes
+from paper_metadata import read_original_date
 
 def main(url, base_font_pt, baseline_pt, single_column=False, single_column_margin=None, output_suffix="_formatted"):
 
@@ -50,7 +52,9 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         except Exception:
             version_str = ""
     print(f"arXiv ID: {paper_id}  Version: {version_str}")
-    tar_path = download_file(url, save_as=os.path.join(downloads_dir, f"{paper_id}.tar.gz"))
+    # Pin both source and original PDF to the resolved arXiv version.
+    source_url = f"https://arxiv.org/abs/{paper_id}{version_str}" if version_str else url
+    tar_path = download_file(source_url, save_as=os.path.join(downloads_dir, f"{paper_id}.tar.gz"))
     print("=" * 60 + "\n")
 
     # Derive folder name from URL (e.g., Just arXiv ID)
@@ -79,6 +83,11 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
     # Step 4. Replace missing document classes with standard article class
     tex_with_class = replace_missing_document_class(largest_tex)
 
+    original_date = read_original_date(paper_id, version_str)
+    with open(os.path.join(paper_folder, 'original_date.json'), 'w', encoding='utf-8') as f:
+        json.dump(original_date, f, indent=2)
+    print(f"Original-PDF date lookup: {original_date['status']}")
+
     # Apply formatting improvements
     print("=" * 60)
     print("🎨 Applying formatting improvements...")
@@ -89,6 +98,7 @@ def main(url, base_font_pt, baseline_pt, single_column=False, single_column_marg
         baseline_pt=baseline_pt,
         single_column=single_column,
         single_column_margin=single_column_margin,
+        original_printed_date=original_date['printed_date'],
     )
     print("=" * 60 + "\n")
     
