@@ -79,6 +79,57 @@ def _repair_mnras_author_footnotes(tex: str) -> str:
     return tex[:start] + author_text + tex[end - 1:]
 
 
+def _repair_aastex_longtable_paragraph_cells(tex: str) -> str:
+    """Avoid AASTeX paragraph-column parsing for spanning longtable cells."""
+    # Mask comments without changing offsets; retain escaped percent signs/braces.
+    active = re.sub(
+        r"\\[\\%{}]|%[^\n]*",
+        lambda match: ' ' * len(match[0]) if match[0].startswith('%') else match[0],
+        tex,
+    )
+    if not re.search(
+        r"^[ \t]*\\documentclass(?:\[[^\]]*\])?\{aastex[^}]*\}",
+        active, re.MULTILINE,
+    ):
+        return tex
+
+    paragraph_cell = re.compile(
+        r"\\multicolumn\s*\{\s*(\d+)\s*\}\s*"
+        r"\{\s*p\s*\{([^{}]+)\}\s*\}\s*\{"
+    )
+    replacements = []
+    for table in re.finditer(
+        r"\\begin\{longtable\}.*?\\end\{longtable\}", active, re.DOTALL,
+    ):
+        for cell in paragraph_cell.finditer(active, table.start(), table.end()):
+            # Find the complete cell content, including nested TeX groups.
+            start = cell.end()
+            end, depth = start, 1
+            while end < table.end() and depth:
+                if active[end] == '\\':
+                    end += 2
+                    continue
+                if active[end] == '{':
+                    depth += 1
+                elif active[end] == '}':
+                    depth -= 1
+                end += 1
+            if depth:
+                continue
+            content = tex[start:end - 1]
+            replacement = (
+                r'\multicolumn{' + cell[1] + r'}{l}{\parbox[t]{'
+                + cell[2].strip() + '}{' + content + '}}'
+            )
+            replacements.append((cell.start(), end, replacement))
+
+    for start, end, replacement in reversed(replacements):
+        tex = tex[:start] + replacement + tex[end:]
+    if replacements:
+        print(f'Repaired {len(replacements)} AASTeX longtable paragraph cell(s)')
+    return tex
+
+
 def set_tuning_values_newfile(
     tex_path: str,
     base_font_pt=None,
@@ -91,6 +142,7 @@ def set_tuning_values_newfile(
         tex = f.read()
 
     tex = _repair_mnras_author_footnotes(tex)
+    tex = _repair_aastex_longtable_paragraph_cells(tex)
 
     resolved_base_font_pt = 12 if base_font_pt is None else base_font_pt
     if baseline_pt is None:
