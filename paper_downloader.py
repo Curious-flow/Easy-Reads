@@ -171,6 +171,38 @@ def replace_missing_document_class(tex_path: str, force_replace: bool = False) -
     
     if match:
         current_class = match.group(1)
+
+        class_file = current_class + ".cls"
+        tex_dir = os.path.dirname(os.path.abspath(tex_path))
+        local_class = os.path.join(tex_dir, class_file)
+        cached_class = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "journal latex files",
+            current_class,
+            class_file,
+        )
+
+        if os.path.isfile(cached_class):
+            if os.path.isfile(local_class):
+                return tex_path
+
+            import subprocess
+            try:
+                result = subprocess.run(
+                    ["kpsewhich", class_file],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                installed = result.returncode == 0 and bool(result.stdout.strip())
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                installed = False
+
+            if not installed:
+                shutil.copy2(cached_class, local_class)
+                print(f"Using cached journal class: {class_file}")
+
+            return tex_path
         
         # Check if it's a journal-specific class
         if current_class.lower() in [jc.lower() for jc in journal_classes]:

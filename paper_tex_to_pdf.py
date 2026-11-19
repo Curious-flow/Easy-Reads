@@ -124,6 +124,53 @@ def compile_with_multiple_passes(tex_file_path, output_dir=None):
                     break
 
             if bib_file:
+                # Read the bibliography style requested by LaTeX.
+                aux_path = os.path.join(compile_dir, tex_name + ".aux")
+                if os.path.isfile(aux_path):
+                    with open(aux_path, encoding="utf-8", errors="ignore") as f:
+                        aux_content = f.read()
+
+                    styles = re.findall(r"\\bibstyle\{([^}]+)\}", aux_content)
+                    cache_dir = os.path.join(
+                        os.path.dirname(os.path.abspath(__file__)),
+                        "journal latex files",
+                    )
+
+                    for style in set(styles):
+                        filename = style.strip() + ".bst"
+
+                        # Only handle simple filenames from the shared cache.
+                        if "/" in filename or "\\" in filename:
+                            continue
+
+                        if os.path.isfile(os.path.join(compile_dir, filename)):
+                            continue
+
+                        try:
+                            result = subprocess.run(
+                                ["kpsewhich", filename],
+                                capture_output=True,
+                                text=True,
+                                timeout=2,
+                            )
+                            installed = (
+                                result.returncode == 0 and bool(result.stdout.strip())
+                            )
+                        except (OSError, subprocess.TimeoutExpired):
+                            installed = False
+
+                        if installed or not os.path.isdir(cache_dir):
+                            continue
+
+                        for folder in sorted(os.listdir(cache_dir)):
+                            cached_style = os.path.join(cache_dir, folder, filename)
+                            if os.path.isfile(cached_style):
+                                shutil.copy2(
+                                    cached_style, os.path.join(compile_dir, filename)
+                                )
+                                print(f"Using cached bibliography style: {filename}")
+                                break
+
                 print(f"   Pass 2: bibtex (using {bib_file})")
                 result2 = subprocess.run(['bibtex', tex_name], capture_output=True, text=True)
                 if result2.returncode != 0:
